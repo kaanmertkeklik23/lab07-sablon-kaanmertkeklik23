@@ -1,0 +1,32 @@
+name: Otomatik Değerlendirme
+
+on: [push, workflow_dispatch]
+
+jobs:
+  degerlendir:
+    runs-on: ubuntu-latest
+
+    services:
+      mongo:
+        image: mongo:7
+        ports:
+          - 27017:27017
+
+    steps:
+      - name: Depoyu al
+        uses: actions/checkout@v4
+
+      - name: Python kur
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Bağımlılıkları kur
+        run: |
+          pip install pymongo
+          npm install -g mongosh
+
+      - name: Değerlendir
+        env:
+          MONGO_URI: mongodb://localhost:27017
+        run: python kontrol/kontrol.py
