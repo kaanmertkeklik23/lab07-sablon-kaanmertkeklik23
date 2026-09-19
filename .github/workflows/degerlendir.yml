@@ -2,6 +2,12 @@ name: Otomatik Değerlendirme
 
 on: [push, workflow_dispatch]
 
+# Öğrenci arka arkaya push ederse önceki koşuyu iptal et:
+# hem sonuç daha hızlı gelir hem Actions dakikası boşa gitmez.
+concurrency:
+  group: degerlendir-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   degerlendir:
     runs-on: ubuntu-latest
