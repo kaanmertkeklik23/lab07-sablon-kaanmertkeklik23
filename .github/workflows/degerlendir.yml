@@ -1,6 +1,9 @@
 name: Otomatik Değerlendirme
 
-on: [push, workflow_dispatch]
+on:
+  push:
+    branches: [main]      # feedback dalinda kosmasin: Classroom 50'nin geri bildirim PR'i orada acilir
+  workflow_dispatch:
 
 # Öğrenci arka arkaya push ederse önceki koşuyu iptal et:
 # hem sonuç daha hızlı gelir hem Actions dakikası boşa gitmez.
