@@ -199,7 +199,9 @@ def kontrol_ai():
     icerik = oku("sonuc/ai_elestiri.md")
     if not icerik or len(icerik.strip()) < 300:
         kaydet("AI Köşesi", 0, 10,
-               "sonuc/ai_elestiri.md yok ya da çok kısa (içerik asistan tarafından ayrıca okunur).")
+               "sonuc/ai_elestiri.md yok ya da 300 karakterden kısa. Föyde istenen iki "
+               "somut eleştiriyi yazdığınızda bu uzunluk zaten aşılır "
+               "(içerik ayrıca asistan tarafından okunur).")
     else:
         kaydet("AI Köşesi", 10, 10,
                "Dosya teslim edildi (isabet puanı asistan değerlendirmesiyle kesinleşir).")
