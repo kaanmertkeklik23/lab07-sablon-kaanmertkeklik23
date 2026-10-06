@@ -28,6 +28,26 @@ services:
     ports:
       - "6379:6379"
 
+  # Kendinizi PUSH ETMEDEN kontrol edin — Actions dakikası harcamaz:
+  #     docker compose run --rm kontrol
+  # Aynı değerlendirici, aynı puan. Yalnız doğru sonucu aldığınızda push edin.
+  kontrol:
+    build:
+      context: .
+      dockerfile: kontrol/Dockerfile
+    profiles: ["arac"]
+    depends_on:
+      - postgres
+      - mongo
+      - redis
+    environment:
+      MONGO_URI: "mongodb://mongo:27017"
+    volumes:
+      - .:/is
+    working_dir: /is
+    command: python kontrol/kontrol.py
+
 volumes:
+  pipcache:
   pgdata:
   mongodata:

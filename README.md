@@ -43,6 +43,24 @@ docker exec -it vtys-redis redis-cli
 Değerlendirici, CRUD betiğinizi CI'daki MongoDB'de çalıştırıp sonucu
 veritabanı **durumundan** doğrular; transkriptlerdeki sayılar size özeldir.
 
+
+## Push etmeden önce kendinizi kontrol edin
+
+Değerlendiriciyi kendi bilgisayarınızda çalıştırabilirsiniz — GitHub'daki ile
+**aynı dosya, aynı puan**:
+
+```bash
+docker compose run --rm kontrol
+```
+
+Ekrana görev görev puanınız ve eksikleriniz düşer. İlk çalıştırma birkaç
+saniye sürer, sonrakiler ~2 saniye. Ayrıca bir şey kurmanız gerekmez; Docker
+zaten kurulu.
+
+**Önce burada tam puan alın, sonra push edin.** Her push GitHub'da sınıfın
+ortak Actions kotasından dakika harcar; deneme-yanılmayı buraya taşırsanız
+kota dönem sonuna kadar yeter.
+
 ## Teslim
 
 ```bash
