@@ -41,9 +41,15 @@ def kaydet(gorev, alinan, tam, mesaj):
 
 def oku(yol):
     p = KOK / yol
-    if not p.exists():
+    # is_file(): ogrenci bazen dosya yerine AYNI ADLA KLASOR olusturuyor
+    # (ornegin "sonuc/g1.txt/g1.txt"). exists() bunu dosya sanip read_bytes()
+    # ile cokuyor ve TUM degerlendirme sifirlaniyordu.
+    if not p.is_file():
         return None
-    ham = p.read_bytes()
+    try:
+        ham = p.read_bytes()
+    except OSError:
+        return None
     # Windows'ta PowerShell'in ">" yonlendirmesi UTF-16 yazar; Not Defteri de
     # UTF-8'e BOM ekler. Bunlari cozmezsek ogrencinin dogru cikti dosyasi
     # taninmaz ve haksiz puan kaybi olur.
