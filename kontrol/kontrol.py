@@ -259,8 +259,8 @@ def main():
     tam = sum(s[2] for s in SONUCLAR)
     print("\n" + "=" * 64)
     print(f"TOPLAM (otomatik kontrol edilen kısım): {alinan}/{tam}")
-    print("Ön quiz (5p) bu rapora dahil değildir; rapor metinleri ve AI")
-    print("köşesi asistan tarafından ayrıca değerlendirilir.")
+    print("Rapor metinleri ve AI köşesi asistan tarafından ayrıca")
+    print("değerlendirilir.")
     print("=" * 64)
 
     ozet = os.environ.get("GITHUB_STEP_SUMMARY")
