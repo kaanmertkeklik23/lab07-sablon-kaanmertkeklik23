@@ -70,10 +70,30 @@ def sayi_var(metin, deger):
     return re.search(rf"(?<!\d){deger}(?!\d)", metin) is not None
 
 
+DB_ADI = "vtysdb"
+
+
+def mongosh_hedefi():
+    """mongosh'a verilecek baglanti dizesi; veritabani adi SART.
+
+    MONGO_URI veritabani yolu tasimiyor (mongodb://localhost:27017).
+    Ogrenci betigini foyde 'mongosh vtysdb' ile calistirdigi icin dosyanin
+    basindaki getSiblingDB satirini silip gectiginde betik CI'da 'test'
+    veritabanina yaziyordu: kendi makinesinde sorunsuz calisan dogru bir
+    teslim, Gorev 1'in uc denetiminden de (14 puan) sessizce sifir aliyordu.
+    Hedefe veritabani adini biz ekliyoruz; betikteki getSiblingDB satiri
+    varsa zararsiz sekilde ayni veritabanini secer.
+    """
+    uri = os.environ.get("MONGOSH_URI", MONGO_URI).rstrip("/")
+    temel, ayrac, sorgu = uri.partition("?")
+    if "/" not in temel.split("://", 1)[-1]:
+        temel = f"{temel}/{DB_ADI}"
+    return temel + ayrac + sorgu
+
+
 def mongosh_calistir(betik):
     """Bir mongosh betiğini stdin üzerinden çalıştırır."""
-    cmd = MONGOSH.split() + ["--quiet",
-                             os.environ.get("MONGOSH_URI", MONGO_URI)]
+    cmd = MONGOSH.split() + ["--quiet", mongosh_hedefi()]
     r = subprocess.run(cmd, input=betik, capture_output=True,
                        text=True, timeout=120)
     return r.returncode, (r.stdout + r.stderr)
@@ -121,25 +141,48 @@ def kontrol_g1(db, t):
 
 
 # ------------------------------------------------------------- Görev 2
-def kontrol_g2(t):
+def kontrol_g2(db, t):
     dosya = oku("mongo/g2_sorgular.js") or ""
     icerik = oku("sonuc/g2.txt") or ""
     puan = 0
     mesajlar = []
 
+    # Foy once Gorev 1'i (uye ekle / guncelle / sil) sonra Gorev 2'nin
+    # sayim sorgularini yaptiriyor. Dolayisiyla ogrencinin olctugu sayilar
+    # KURULUM verisininkiler degil, CRUD'dan SONRAKI canli durumunkilerdir:
+    #   * uye 10'un dogum yili 1999'a cekiliyor,
+    #   * uye 20 siliniyor (telefonlariyla birlikte),
+    #   * ogrenci kendini uye 9001 olarak kendi dogum yiliyla ekliyor.
+    # Beklenen degeri yalnizca ham veriden hesaplamak, foyun kendi sirasini
+    # izleyen ogrenciyi cezalandiriyordu (2.1 ve 2.3, 10 puan). Iki sira da
+    # gecerli bir calisma oldugu icin HER IKI deger de kabul edilir.
     tel_map = Counter()
     for tel in t["telefonlar"]:
         tel_map[tel["uye_id"]] += 1
-    b21 = sum(1 for u in t["uyeler"] if u["dogum_yili"] >= 2000)
-    b22 = sum(1 for d in t["dersler"] if d["ucret"] > 500)
-    b23 = sum(1 for u in t["uyeler"] if tel_map[u["uye_id"]] == 3)
-    b24 = Counter(k["ders_id"] for k in t["kayitlar"]).most_common(1)[0][1]
+    ham = (
+        sum(1 for u in t["uyeler"] if u["dogum_yili"] >= 2000),
+        sum(1 for d in t["dersler"] if d["ucret"] > 500),
+        sum(1 for u in t["uyeler"] if tel_map[u["uye_id"]] == 3),
+        Counter(k["ders_id"] for k in t["kayitlar"]).most_common(1)[0][1],
+    )
+    try:
+        enc = list(db.kayitlar.aggregate([
+            {"$group": {"_id": "$ders_id", "adet": {"$sum": 1}}},
+            {"$sort": {"adet": -1}}, {"$limit": 1}]))
+        canli = (
+            db.uyeler.count_documents({"dogum_yili": {"$gte": 2000}}),
+            db.dersler.count_documents({"ucret": {"$gt": 500}}),
+            db.uyeler.count_documents({"telefonlar": {"$size": 3}}),
+            enc[0]["adet"] if enc else ham[3],
+        )
+    except Exception:
+        canli = ham
 
     if not icerik:
         kaydet("Görev 2 (Sorgular)", 0, 30, "sonuc/g2.txt bulunamadı.")
         return
-    for no, b in ((1, b21), (2, b22), (3, b23), (4, b24)):
-        if sayi_var(icerik, b):
+    for no, (a, b) in enumerate(zip(ham, canli), start=1):
+        if sayi_var(icerik, a) or sayi_var(icerik, b):
             puan += 5
         else:
             mesajlar.append(f"2.{no}: beklenen değer transkriptte yok.")
@@ -247,10 +290,10 @@ def main():
         print(f"HATA: doküman modeli kurulamadı:\n{cikti}")
         sys.exit(2)
 
-    db = MongoClient(MONGO_URI, serverSelectionTimeoutMS=10000).vtysdb
+    db = MongoClient(MONGO_URI, serverSelectionTimeoutMS=10000)[DB_ADI]
 
     kontrol_g1(db, t)
-    kontrol_g2(t)
+    kontrol_g2(db, t)
     kontrol_g3(t)
     kontrol_g4(t)
     kontrol_ai()
