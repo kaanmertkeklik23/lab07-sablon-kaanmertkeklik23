@@ -35,6 +35,7 @@ jobs:
         run: |
           pip install pymongo
           npm install -g mongosh
+          npm install --prefix /usr/local/lib/node_modules/mongosh mongodb-redact
 
       - name: Değerlendir
         env:
