@@ -1,0 +1,24 @@
+// 1) İndeks öncesi: db.kayitlar.find({ ders_id: 3 }).explain("executionStats")
+{
+  stage: 'COLLSCAN',
+  filter: { ders_id: { '$eq': 3 } },
+  nReturned: 7,
+  executionTimeMillisEstimate: 0,
+  totalKeysExamined: 0,
+  totalDocsExamined: 369
+}
+
+// 2) İndeks oluşturma: db.kayitlar.createIndex({ ders_id: 1 })
+ders_id_1
+
+// 3) İndeks sonrası: db.kayitlar.find({ ders_id: 3 }).explain("executionStats")
+{
+  stage: 'IXSCAN',
+  keyPattern: { ders_id: 1 },
+  indexName: 'ders_id_1',
+  nReturned: 7,
+  executionTimeMillisEstimate: 0,
+  totalKeysExamined: 7,
+  totalDocsExamined: 7
+}
+

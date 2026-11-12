@@ -1,0 +1,23 @@
+127.0.0.1:6379> SET toplam:kayit 369
+OK
+127.0.0.1:6379> GET toplam:kayit
+"369"
+127.0.0.1:6379> EXPIRE toplam:kayit 60
+(integer) 1
+127.0.0.1:6379> TTL toplam:kayit
+(integer) 56
+127.0.0.1:6379> TTL toplam:kayit
+(integer) -2
+127.0.0.1:6379> GET toplam:kayit
+(nil)
+127.0.0.1:6379> INCR ziyaret:bugun
+(integer) 1
+127.0.0.1:6379> INCR ziyaret:bugun
+(integer) 2
+127.0.0.1:6379> INCR ziyaret:bugun
+(integer) 3
+127.0.0.1:6379> GET ziyaret:bugun
+"3"
+
+Sektörde kullanım alanları: GET/SET sık okunan ancak hesaplanması maliyetli veritabanı sorgularının veya kullanıcı oturum (session) verilerinin bellekte önbelleklenmesinde (caching), TTL (EXPIRE) önbellekteki verinin bayatlamasını önlemek ve tek kullanımlık doğrulama kodları (OTP) veya oturum anahtarlarını belirli süre sonunda otomatik silmekte, INCR ise atomik çalıştığı için anlık sayfa görüntülenme sayaçları, aktif ziyaretçi istatistikleri ve API istek sınırlandırma (rate limiting) işlemlerinde kullanılır.
+

@@ -11,3 +11,18 @@
 // =====================================================
 db = db.getSiblingDB('vtysdb');
 
+db.uyeler.insertOne({
+  _id: 9001,
+  ad: "Kaan Mert KEKLİK",
+  dogum_yili: 2004,
+  telefonlar: ["0532-123-4567"]
+});
+
+db.uyeler.updateOne(
+  { _id: 10 },
+  { $set: { dogum_yili: 1999 } }
+);
+
+db.uyeler.deleteOne({ _id: 20 });
+
+print(db.kayitlar.countDocuments({ uye_id: 20 }));

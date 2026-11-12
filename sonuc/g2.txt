@@ -1,0 +1,41 @@
+// Soru 2.1
+// (2000 ve sonrası doğumlu üye sayısı)
+db.uyeler.countDocuments({ dogum_yili: { $gte: 2000 } })
+30
+31
+
+// Soru 2.2
+// (Ücreti 500'den yüksek derslerin adı ve ücreti — toplam 8 ders)
+db.dersler.find({ ucret: { $gt: 500 } }, { ad: 1, ucret: 1, _id: 0 })
+[
+  { _id: 1, ad: 'Kardiyo Dayanıklılık — İleri', ucret: 600 },
+  { _id: 2, ad: 'Gençlik Yüzme — Orta', ucret: 550 },
+  { _id: 13, ad: 'Hamile Yogası — İleri', ucret: 550 },
+  { _id: 14, ad: 'Gençlik Yüzme — İleri', ucret: 600 },
+  { _id: 16, ad: 'Pilates Matwork — İleri', ucret: 600 },
+  { _id: 17, ad: 'Core Güçlendirme — İleri', ucret: 600 },
+  { _id: 18, ad: 'Gençlik Yüzme — Başlangıç', ucret: 600 },
+  { _id: 28, ad: 'Sabah Yogası — Başlangıç', ucret: 550 }
+]
+Toplam ders sayısı: 8
+
+// Soru 2.3
+// (Tam 3 telefonu olan üye sayısı — gömülü diziyi sorgulayın)
+db.uyeler.countDocuments({ telefonlar: { $size: 3 } })
+52
+51
+
+// Soru 2.4
+// (aggregate + $group: her dersin kayıt sayısı, en çoktan aza ilk 5)
+db.kayitlar.aggregate([
+  { $group: { _id: "$ders_id", adet: { $sum: 1 } } },
+  { $sort: { adet: -1 } },
+  { $limit: 5 }
+])
+[
+  { _id: 6, adet: 18 },
+  { _id: 1, adet: 16 },
+  { _id: 18, adet: 16 },
+  { _id: 5, adet: 15 },
+  { _id: 23, adet: 15 }
+]

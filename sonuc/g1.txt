@@ -1,0 +1,5 @@
+db.kayitlar.countDocuments({ uye_id: 20 })
+5
+
+PostgreSQL'de aynı silme denemesinde (Föy 02, Görev 5), kayitlar tablosundaki uye_id yabancı anahtar (FOREIGN KEY / REFERENCES) kısıtı nedeniyle veritabanı referans bütünlüğünü (referential integrity) korumak için silme işlemini reddetmiş ve foreign key constraint ihlali hatası vermişti.
+
